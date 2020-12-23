@@ -2,6 +2,7 @@ import cats.effect.{Blocker, ContextShift, IO, Resource}
 import com.typesafe.config.ConfigFactory
 import pureconfig._
 import pureconfig.module.catseffect.syntax._
+import pureconfig.generic.auto._
 
 package object config {
 
