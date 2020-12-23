@@ -19,6 +19,8 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-specs2" % DoobieVersion,
   "org.tpolecat" %% "doobie-scalatest" % DoobieVersion,
 
+  "io.zonky.test" % "embedded-postgres" % "1.2.9",
+
   "com.github.pureconfig" %% "pureconfig" % PureConfigVersion,
   "com.github.pureconfig" %% "pureconfig-cats-effect" % PureConfigVersion,
 

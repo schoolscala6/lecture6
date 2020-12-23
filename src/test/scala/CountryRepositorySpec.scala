@@ -1,17 +1,35 @@
-import cats.effect.IO
+import cats.effect.{Blocker, ContextShift, IO}
 import doobie.implicits._
 import doobie.scalatest._
 import doobie.util.transactor.Transactor
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import model.Country
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import repository.CountryRepository
 
 import scala.concurrent.ExecutionContext
 
-class CountryRepositorySpec extends AnyWordSpec with Matchers with IOChecker {
-  def transactor: Transactor[IO] = {
-    implicit val cs: cats.effect.ContextShift[IO] = IO.contextShift(ExecutionContext.global)
+class CountryRepositorySpec extends AnyWordSpec with Matchers with BeforeAndAfterAll {
+
+  private var postgres: EmbeddedPostgres = _
+  private var transactor: Transactor[IO] = _
+
+  implicit private val ioContextShift: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
+
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+
+    postgres = EmbeddedPostgres.builder().start()
+
+    transactor = Transactor.fromDriverManager[IO](
+      "org.postgresql.Driver",
+      postgres.getJdbcUrl("postgres", "postgres"),
+      "postgres",
+      "postgres",
+      Blocker.liftExecutionContext(ExecutionContext.global)
+    )
 
     val createSql = sql"""create table country
                          |(
@@ -32,13 +50,9 @@ class CountryRepositorySpec extends AnyWordSpec with Matchers with IOChecker {
                          |    code2          varchar not null
                          |)""".stripMargin
 
-    val tx = Transactor.fromDriverManager[IO]("org.h2.Driver", "jdbc:h2:mem:test_sb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1", "sa", "")
-
     createSql.update.run
-      .transact(tx)
+      .transact(transactor)
       .unsafeRunSync()
-
-    tx
   }
 
   private lazy val repository = new CountryRepository(transactor)
@@ -62,5 +76,10 @@ class CountryRepositorySpec extends AnyWordSpec with Matchers with IOChecker {
       countries.size shouldBe 1
       countries.head.code shouldBe "BIG"
     }
+  }
+
+  override protected def afterAll(): Unit = {
+    postgres.close()
+    super.afterAll()
   }
 }
