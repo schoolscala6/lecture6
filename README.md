@@ -8,11 +8,8 @@ Setup postgres
 
 ```
 curl -O https://raw.githubusercontent.com/tpolecat/doobie/series/0.7.x/world.sql
-psql -c 'create user postgres createdb' postgres
-psql -c 'create database world;' -U postgres
-psql -c '\i world.sql' -d world -U postgres
-psql -d world -c "create type myenum as enum ('foo', 'bar')" -U postgres
-psql -d world -c "create extension postgis" -U postgres
+docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=world -v $(pwd)/world.sql:/world.sql -d postgres
+docker exec -it postgres psql -U postgres -d world -a -f world.sql
 ```
 
 Run application
