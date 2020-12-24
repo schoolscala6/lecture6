@@ -6,6 +6,8 @@ https://tpolecat.github.io/doobie/docs/01-Introduction.html
 
 Setup postgres
 
+https://hub.docker.com/_/postgres
+
 ```
 curl -O https://raw.githubusercontent.com/tpolecat/doobie/series/0.7.x/world.sql
 
