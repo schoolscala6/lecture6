@@ -29,6 +29,6 @@ docker exec -it postgres psql -U postgres -d world -a -f world.sql
 ```sbt test```
 
 ### Links
-https://getquill.io/#quotation-introduction
-https://blog.softwaremill.com/testing-doobie-programs-425517c1c295
-https://github.com/jaspervz/todo-http4s-doobie
+- https://getquill.io/#quotation-introduction
+- https://blog.softwaremill.com/testing-doobie-programs-425517c1c295
+- https://github.com/jaspervz/todo-http4s-doobie
