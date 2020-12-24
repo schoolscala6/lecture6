@@ -1,10 +1,10 @@
 # Scala School: Seminar 6 - Doobie
 
-Doobie Documentation
+### Doobie Documentation
 
 https://tpolecat.github.io/doobie/docs/01-Introduction.html
 
-Setup postgres
+### Setup postgres
 
 https://hub.docker.com/_/postgres
 
@@ -20,10 +20,15 @@ docker run --name postgres \
 docker exec -it postgres psql -U postgres -d world -a -f world.sql
 ```
 
-Run application
+### Run application
 
 ```sbt run```
 
-Test application
+### Test application
 
 ```sbt test```
+
+### Links
+https://getquill.io/#quotation-introduction
+https://blog.softwaremill.com/testing-doobie-programs-425517c1c295
+https://github.com/jaspervz/todo-http4s-doobie
