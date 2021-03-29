@@ -10,8 +10,10 @@ package object model {
       localname: String,
       governmentform: String,
       code2: String
-  )
+  ) {
+    override def toString: String = s"$code-$name: $population"
+  }
 
-  case object CountryNotFoundError
+  case class CountryNotFoundError(code: String)
 
 }

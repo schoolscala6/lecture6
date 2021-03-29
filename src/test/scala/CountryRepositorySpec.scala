@@ -60,20 +60,20 @@ class CountryRepositorySpec extends AnyWordSpec with Matchers with BeforeAndAfte
   "Country Repository" should {
     "insert a country" in {
       val bigCountry = Country("BIG", "Big Country", "Europe", "Europe", 1277558000, 1277558000, "Supper Country", "Republic", "BI")
-      val result     = repository.createCountryQ(bigCountry).unsafeRunSync()
+      val result     = repository.createCountry(bigCountry).unsafeRunSync()
       result shouldBe "BIG"
     }
 
     "get all countries" in {
-      val countries = repository.getCountriesQ.compile.toList.unsafeRunSync()
+      val countries = repository.getCountries.compile.toList.unsafeRunSync()
       countries.size shouldBe 1
       countries.head.code shouldBe "BIG"
     }
 
     "delete country" in {
-      repository.deleteCountryQ("BIG")
-      val countries = repository.getCountriesQ.compile.toList.unsafeRunSync()
-      countries.size shouldBe 1
+      repository.deleteCountry("BIG")
+      val countries = repository.getCountries.compile.toList.unsafeRunSync()
+      countries.size shouldBe 0
       countries.head.code shouldBe "BIG"
     }
   }

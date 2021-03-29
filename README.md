@@ -11,14 +11,12 @@ https://hub.docker.com/_/postgres
 ```
 curl -O https://raw.githubusercontent.com/tpolecat/doobie/series/0.7.x/world.sql
 
-docker run --name postgres \
--p 5432:5432 \
--e POSTGRES_PASSWORD=postgres \
--e POSTGRES_DB=world \
--v $(pwd)/world.sql:/world.sql -d postgres
+docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=world -v $(pwd)/world.sql:/world.sql -d postgres
 
 docker exec -it postgres psql -U postgres -d world -a -f world.sql
 ```
+
+![Alt text](db_connection.png?raw=true "Title")
 
 ### Run application
 

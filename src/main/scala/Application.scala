@@ -8,44 +8,45 @@ import repository.CountryRepository
 
 object Application extends IOApp {
 
-  override def run(args: List[String]): IO[ExitCode] = resources("application.conf").use(create)
+  private val configFile: String = "application.conf"
 
-  case class Resources(transactor: Transactor[IO], config: Config)
-
-  private def resources(configFile: String)(implicit contextShift: ContextShift[IO]): Resource[IO, Resources] =
-    for {
+  override def run(args: List[String]): IO[ExitCode] = {
+    (for {
       config     <- Config.load(configFile)
-      ec         <- ExecutionContexts.fixedThreadPool[IO](config.database.threadPoolSize)
+      context    <- ExecutionContexts.fixedThreadPool[IO](config.database.threadPoolSize)
       blocker    <- Blocker[IO]
-      transactor <- Database.transactor(config.database, ec, blocker)
-    } yield Resources(transactor, config)
+      transactor <- Database.transactor(config.database, context, blocker)
+    } yield Resources(transactor, config)).use(execute)
+  }
 
-  private def create(resources: Resources)(implicit concurrentEffect: ConcurrentEffect[IO], timer: Timer[IO]): IO[ExitCode] = {
+  private def execute(resources: Resources)(implicit concurrentEffect: ConcurrentEffect[IO], timer: Timer[IO]): IO[ExitCode] = {
     val repository = new CountryRepository(resources.transactor)
     for {
-      countries <- repository.getCountriesQ.compile.toList
-      _         <- IO(println("Countries BEFORE INSERT operation"))
+      countries <- repository.getCountries.compile.toList
+      _         <- IO(println("\nCountries BEFORE INSERT operation"))
       _         <- IO(countries.take(5).foreach(println))
 
-      bigCountry = Country("BIG", "Big Country", "Europe", "Europe", 1277558000, 1277558000, "Supper Country", "Republic", "BI")
-      newCountry <- repository.createCountryQ(bigCountry).attempt
-      _          <- IO(println(s"Added new country with code: $newCountry"))
+      bigCountry = Country("BIG", "Supper Country", "Europe", "Europe", 1300000000, 1300000000, "Supper Country", "Republic", "BI")
+      newCountry <- repository.createCountry(bigCountry).attempt
+      _          <- IO(println(s"\nAdded new country with code: $newCountry"))
 
-      newCountry2 <- repository.createCountryQ(bigCountry).attempt
+      newCountry2 <- repository.createCountry(bigCountry).attempt
       _ <- newCountry2 match {
         case Left(e)      => IO(println(s"Error occurred in creation new country: $e"))
         case Right(value) => IO(println(s"Added new country with code: $value"))
       }
 
-      countries2 <- repository.getCountriesQ.compile.toList
-      _          <- IO(println("Countries AFTER INSERT operation"))
+      countries2 <- repository.getCountries.compile.toList
+      _          <- IO(println("\nCountries AFTER INSERT operation"))
       _          <- IO(countries2.take(5).foreach(println))
 
-      _          <- repository.deleteCountryQ("BIG")
-      countries3 <- repository.getCountriesQ.compile.toList
-      _          <- IO(println("Countries AFTER DELETE operation"))
+      _          <- repository.deleteCountry("BIG")
+      countries3 <- repository.getCountries.compile.toList
+      _          <- IO(println("\nCountries AFTER DELETE operation"))
       _          <- IO(countries3.take(5).foreach(println))
 
     } yield ExitCode.Success
   }
+
+  case class Resources(transactor: Transactor[IO], config: Config)
 }
