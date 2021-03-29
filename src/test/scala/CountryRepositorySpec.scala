@@ -71,10 +71,9 @@ class CountryRepositorySpec extends AnyWordSpec with Matchers with BeforeAndAfte
     }
 
     "delete country" in {
-      repository.deleteCountry("BIG")
+      repository.deleteCountry("BIG").unsafeRunSync()
       val countries = repository.getCountries.compile.toList.unsafeRunSync()
       countries.size shouldBe 0
-      countries.head.code shouldBe "BIG"
     }
   }
 

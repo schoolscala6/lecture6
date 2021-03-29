@@ -30,6 +30,7 @@ object Application extends IOApp {
       newCountry <- repository.createCountry(bigCountry).attempt
       _          <- IO(println(s"\nAdded new country with code: $newCountry"))
 
+      _          <- IO(println(s"\nTry again to add new country with code: $newCountry"))
       newCountry2 <- repository.createCountry(bigCountry).attempt
       _ <- newCountry2 match {
         case Left(e)      => IO(println(s"Error occurred in creation new country: $e"))
